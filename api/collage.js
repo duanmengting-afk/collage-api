@@ -48,47 +48,66 @@ export default async function handler(req, res) {
 }
 
 function computeLayout(n, W) {
-  const RATIO = 4 / 3;
+  const H = Math.round(W * 4 / 3); // 固定画布 3:4
+
   if (n === 1) {
-    const h = Math.round(W * RATIO);
-    return { canvasH: h, cells: [{ x: 0, y: 0, w: W, h }] };
+    return { canvasH: H, cells: [{ x: 0, y: 0, w: W, h: H }] };
   }
+
   if (n === 2) {
-    const cw = Math.round(W / 2), h = Math.round(cw * RATIO);
-    return { canvasH: h, cells: [{ x: 0, y: 0, w: cw, h }, { x: cw, y: 0, w: W - cw, h }] };
-  }
-  if (n === 3) {
-    const cw = Math.round(W / 3), h = Math.round(cw * RATIO);
-    return { canvasH: h, cells: [{ x: 0, y: 0, w: cw, h }, { x: cw, y: 0, w: cw, h }, { x: cw * 2, y: 0, w: W - cw * 2, h }] };
-  }
-  if (n === 4) {
-    const cw = Math.round(W / 2), ch = Math.round(cw * RATIO);
-    return { canvasH: ch * 2, cells: [{ x: 0, y: 0, w: cw, h: ch }, { x: cw, y: 0, w: W - cw, h: ch }, { x: 0, y: ch, w: cw, h: ch }, { x: cw, y: ch, w: W - cw, h: ch }] };
-  }
-  if (n === 5) {
-    const lw = Math.round(W * 0.5), rw = W - lw;
-    const smallW = Math.round(rw / 2), smallH = Math.round(smallW * RATIO);
-    const totalH = smallH * 2;
-    return { canvasH: totalH, cells: [
-      { x: 0, y: 0, w: lw, h: totalH },
-      { x: lw, y: 0, w: smallW, h: smallH },
-      { x: lw + smallW, y: 0, w: rw - smallW, h: smallH },
-      { x: lw, y: smallH, w: smallW, h: smallH },
-      { x: lw + smallW, y: smallH, w: rw - smallW, h: smallH },
+    const cw = Math.round(W / 2);
+    return { canvasH: H, cells: [
+      { x: 0, y: 0, w: cw, h: H },
+      { x: cw, y: 0, w: W - cw, h: H },
     ]};
   }
-  const cw = Math.round(W / 3), ch = Math.round(cw * RATIO);
-  return { canvasH: ch * 2, cells: [
-    { x: 0, y: 0, w: cw, h: ch }, { x: cw, y: 0, w: cw, h: ch }, { x: cw * 2, y: 0, w: W - cw * 2, h: ch },
-    { x: 0, y: ch, w: cw, h: ch }, { x: cw, y: ch, w: cw, h: ch }, { x: cw * 2, y: ch, w: W - cw * 2, h: ch },
-  ]};
-}
 
-function arrayBufferToBase64(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  if (n === 3) {
+    // 上1大图 + 下2小图
+    const ch = Math.round(H / 2);
+    const bw = Math.round(W / 2);
+    return { canvasH: H, cells: [
+      { x: 0, y: 0, w: W, h: ch },
+      { x: 0, y: ch, w: bw, h: H - ch },
+      { x: bw, y: ch, w: W - bw, h: H - ch },
+    ]};
   }
-  return btoa(binary);
+
+  if (n === 4) {
+    const cw = Math.round(W / 2);
+    const ch = Math.round(H / 2);
+    return { canvasH: H, cells: [
+      { x: 0, y: 0, w: cw, h: ch },
+      { x: cw, y: 0, w: W - cw, h: ch },
+      { x: 0, y: ch, w: cw, h: H - ch },
+      { x: cw, y: ch, w: W - cw, h: H - ch },
+    ]};
+  }
+
+  if (n === 5) {
+    // 左大图 + 右侧 2×2
+    const lw = Math.round(W / 2);
+    const rw = W - lw;
+    const smallW = Math.round(rw / 2);
+    const ch = Math.round(H / 2);
+    return { canvasH: H, cells: [
+      { x: 0, y: 0, w: lw, h: H },
+      { x: lw, y: 0, w: smallW, h: ch },
+      { x: lw + smallW, y: 0, w: rw - smallW, h: ch },
+      { x: lw, y: ch, w: smallW, h: H - ch },
+      { x: lw + smallW, y: ch, w: rw - smallW, h: H - ch },
+    ]};
+  }
+
+  // 6张：3行 × 2列
+  const cw = Math.round(W / 2);
+  const ch = Math.round(H / 3);
+  return { canvasH: H, cells: [
+    { x: 0, y: 0, w: cw, h: ch },
+    { x: cw, y: 0, w: W - cw, h: ch },
+    { x: 0, y: ch, w: cw, h: ch },
+    { x: cw, y: ch, w: W - cw, h: ch },
+    { x: 0, y: ch * 2, w: cw, h: H - ch * 2 },
+    { x: cw, y: ch * 2, w: W - cw, h: H - ch * 2 },
+  ]};
 }
