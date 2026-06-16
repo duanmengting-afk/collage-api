@@ -1,10 +1,10 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 const FONTS = {
-  georgia: { family: 'Georgia', style: 'bold' },
-  times:   { family: 'Times New Roman', style: 'bold' },
-  serif:   { family: 'serif', style: 'bold' },
-  sans:    { family: 'Arial', style: 'bold' },
+  georgia: { family: 'DejaVu Serif, Liberation Serif, serif', style: 'bold' },
+  times:   { family: 'DejaVu Serif, Liberation Serif, serif', style: 'bold' },
+  serif:   { family: 'DejaVu Serif, Liberation Serif, serif', style: 'bold' },
+  sans:    { family: 'DejaVu Sans, Liberation Sans, sans-serif', style: 'bold' },
 };
 
 function computeLayout(n, W) {
